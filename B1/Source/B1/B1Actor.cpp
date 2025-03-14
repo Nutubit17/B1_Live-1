@@ -12,12 +12,25 @@ AB1Actor::AB1Actor()
 
 	Box = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Box"));
 	RootComponent = Box;
+	Box->SetRelativeScale3D(FVector(4.0f, 1.0f, 0.5f));
+
+	Head = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Head"));
+	Head->SetupAttachment(RootComponent);
+	Head->SetRelativeLocation(FVector(150.0f, 0.0f, 0.0f));
+	Head->SetRelativeScale3D(FVector(0.1875f, 0.5f, 0.5f));
+
+	Wing = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wing"));
+	Wing->SetupAttachment(RootComponent);
+	Wing->SetRelativeLocation(FVector(17.5f, 0.0f, 0.0f));
+	Wing->SetRelativeScale3D(FVector(0.25f, 3.5f, 0.5f));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> FindMeshRef(TEXT("/Script/Engine.StaticMesh'/Engine/EngineMeshes/Cube.Cube'"));
 
 	if (FindMeshRef.Succeeded())
 	{
 		Box->SetStaticMesh(FindMeshRef.Object);
+		Head->SetStaticMesh(FindMeshRef.Object);
+		Wing->SetStaticMesh(FindMeshRef.Object);
 	}
 }
 
@@ -31,5 +44,21 @@ void AB1Actor::BeginPlay()
 void AB1Actor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	float Speed = 50.0f;
+	float Distance = Speed * DeltaTime;
+
+	FVector Location = GetActorLocation();
+	FVector NewLocation = Location + FVector::ForwardVector * Distance;
+	//SetActorLocation(NewLocation);
+
+	AddActorWorldOffset(FVector::ForwardVector * Distance);
+
+	float RotationRate = 45.0f;
+	FRotator Rotation = GetActorRotation();
+	FRotator NewRotation = FRotator(Rotation.Pitch, Rotation.Yaw + RotationRate * DeltaTime, Rotation.Roll);
+	//SetActorRotation(NewRotation);
+
+	AddActorWorldRotation(FRotator(0.0f, RotationRate * DeltaTime, 0.0f));
 }
 

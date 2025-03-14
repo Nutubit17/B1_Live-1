@@ -30,10 +30,10 @@ void AMainActor::BeginPlay()
 
 	B1Actor = Cast<AB1Actor>(GetWorld()->SpawnActor(ActorClass));
 
-	if (B1Actor)
-	{
-		B1Actor->SetLifeSpan(5.0f);
-	}
+	//if (B1Actor)
+	//{
+	//	B1Actor->SetLifeSpan(5.0f);
+	//}
 
 	//GetWorld()->DestroyActor(B1Actor);
 }
