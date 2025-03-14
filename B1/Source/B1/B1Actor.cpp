@@ -10,26 +10,26 @@ AB1Actor::AB1Actor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Box = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Box"));
+	RootComponent = Box;
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> FindMeshRef(TEXT("/Script/Engine.StaticMesh'/Engine/EngineMeshes/Cube.Cube'"));
+
+	if (FindMeshRef.Succeeded())
+	{
+		Box->SetStaticMesh(FindMeshRef.Object);
+	}
 }
 
 // Called when the game starts or when spawned
 void AB1Actor::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	Obj = NewObject<UB1Object>();
-
-	GEngine->ForceGarbageCollection(true);
 }
 
 // Called every frame
 void AB1Actor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (Obj == nullptr)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Obj Deleted!"));
-	}
 }
 
