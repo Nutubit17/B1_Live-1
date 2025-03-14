@@ -23,4 +23,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UPROPERTY()
+	class UB1Object* Obj;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 Hp = 100;
+
+	UPROPERTY(EditAnywhere)
+	int32 Mp = 50;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed = 3.5f;
 };
