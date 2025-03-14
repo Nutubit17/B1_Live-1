@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "B1Object.h"
+#include "System/B1GameMode.h"
 

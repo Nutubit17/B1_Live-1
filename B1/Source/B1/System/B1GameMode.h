@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "B1Object.generated.h"
+#include "GameFramework/GameModeBase.h"
+#include "B1GameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class B1_API UB1Object : public UObject
+class B1_API AB1GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
