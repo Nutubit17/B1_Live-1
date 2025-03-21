@@ -4,6 +4,7 @@
 #include "Player/B1PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/Character.h"
 
 AB1PlayerController::AB1PlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -31,6 +32,8 @@ void AB1PlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Attack);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Input_Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ThisClass::Input_StopJump);
 	}
 }
 
@@ -57,4 +60,22 @@ void AB1PlayerController::Input_Turn(const FInputActionValue& InputValue)
 {
 	float XValue = InputValue.Get<float>();
 	GetPawn()->AddControllerYawInput(XValue);
+}
+
+void AB1PlayerController::Input_Jump(const FInputActionValue& InputValue)
+{
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetPawn());
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->Jump();
+	}
+}
+
+void AB1PlayerController::Input_StopJump(const FInputActionValue& InputValue)
+{
+	ACharacter* PlayerCharacter = Cast<ACharacter>(GetPawn());
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->StopJumping();
+	}
 }
