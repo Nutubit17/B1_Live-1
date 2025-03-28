@@ -29,10 +29,14 @@ public:
 #pragma region Attack
 public:
 	virtual void ProcessAttack();
+	virtual void ProcessComboAttack();
 
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UAnimMontage> ComboAttackMontage;
 #pragma endregion
 
 };

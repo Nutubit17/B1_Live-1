@@ -95,7 +95,7 @@ void AB1Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AB1Player::Input_Attack(const FInputActionValue& InputValue)
 {
-	ProcessAttack();
+	ProcessComboAttack();
 }
 
 void AB1Player::Input_Move(const FInputActionValue& InputValue)
