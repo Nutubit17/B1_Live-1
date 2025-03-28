@@ -31,12 +31,25 @@ public:
 	virtual void ProcessAttack();
 	virtual void ProcessComboAttack();
 
+	void ComboActionBegin();
+	void ComboActionEnd(class UAnimMontage* TargetMontage, bool IsPropertyEnded);
+
+	void SetComboCheckTimer();
+	void ComboCheck();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UAnimMontage> ComboAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UB1ComboActionData> ComboAttackData;
+
+	int32 CurrentCombo = 0;
+	FTimerHandle ComboTimerHandle;
+	bool HasNextComboAttack = false;
 #pragma endregion
 
 };
