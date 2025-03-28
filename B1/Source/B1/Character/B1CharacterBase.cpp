@@ -32,6 +32,13 @@ AB1CharacterBase::AB1CharacterBase()
 	{
 		GetMesh()->SetSkeletalMesh(FindMeshRef.Object);
 	}
+
+	// Attack Montage 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Attack.AM_Attack'"));
+	if (AttackMontageRef.Succeeded())
+	{
+		AttackMontage = AttackMontageRef.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -53,5 +60,22 @@ void AB1CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AB1CharacterBase::ProcessAttack()
+{
+	if (GetCurrentMontage() == AttackMontage)
+		return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		int32 Index = FMath::RandRange(1, 4);
+		FString SectionName = FString::Printf(TEXT("Attack%d"), Index);
+		AnimInstance->Montage_Play(AttackMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName(*SectionName));
+
+		//PlayAnimMontage(AttackMontage, 1.0f, FName(*SectionName));
+	}
 }
 
