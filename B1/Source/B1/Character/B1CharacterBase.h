@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/B1AttackInterface.h"
 #include "B1CharacterBase.generated.h"
 
 UCLASS()
-class B1_API AB1CharacterBase : public ACharacter
+class B1_API AB1CharacterBase : public ACharacter, public IB1AttackInterface
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
 #pragma region Attack
 public:
 	virtual void ProcessAttack();
@@ -37,12 +40,17 @@ public:
 	void SetComboCheckTimer();
 	void ComboCheck();
 
+	virtual void SetDead();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UAnimMontage> ComboAttackMontage;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UAnimMontage> DeadMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UB1ComboActionData> ComboAttackData;
@@ -52,4 +60,8 @@ protected:
 	bool HasNextComboAttack = false;
 #pragma endregion
 
+
+public:
+	// Inherited via IB1AttackInterface
+	virtual void AttackHitCheck() override;
 };

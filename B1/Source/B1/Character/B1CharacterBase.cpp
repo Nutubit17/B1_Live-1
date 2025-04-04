@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "B1ComboActionData.h"
+#include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AB1CharacterBase::AB1CharacterBase()
@@ -56,6 +58,13 @@ AB1CharacterBase::AB1CharacterBase()
 		ComboAttackMontage = ComboAttackMontageRef.Object;
 	}
 
+	// Dead Montage 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/Animation/AM_Dead.AM_Dead'"));
+	if (DeadMontageRef.Succeeded())
+	{
+		DeadMontage = DeadMontageRef.Object;
+	}
+
 	// ComboAttack Data
 	static ConstructorHelpers::FObjectFinder<UB1ComboActionData> ComboActionDataRef(TEXT("/Script/B1.B1ComboActionData'/Game/CharacterAction/DA_ComboAttack.DA_ComboAttack'"));
 	if (ComboActionDataRef.Succeeded())
@@ -83,6 +92,15 @@ void AB1CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float AB1CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	SetDead();
+
+	return DamageAmount;
 }
 
 void AB1CharacterBase::ProcessAttack()
@@ -181,5 +199,49 @@ void AB1CharacterBase::ComboCheck()
 		SetComboCheckTimer();
 		HasNextComboAttack = false;
 	}
+}
+
+void AB1CharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(false);
+		AnimInstance->Montage_Play(DeadMontage, 1.0f);
+	}
+
+	SetActorEnableCollision(false);
+}
+
+void AB1CharacterBase::AttackHitCheck()
+{
+	const float AttackRange = 120.0f;
+	const float AttackRadius = 50.0f;
+	const float AttackDamage = 30.0f;
+
+	FHitResult OutHitResult;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	if (HitDetected)
+	{
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+
+		//UGameplayStatics::ApplyDamage(OutHitResult.GetActor(), AttackDamage, GetController(), this, nullptr);
+	}
+
+#if ENABLE_DRAW_DEBUG
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+#endif
 }
 
